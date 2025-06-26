@@ -24,7 +24,7 @@ def extract_text_from_docx(docx_file):
 
 # Get AI Suggestions from Gemini
 def get_ai_feedback(resume_text):
-    model = genai.GenerativeModel('gemini-pro')
+    model = genai.GenerativeModel('models/gemini-1.5-flash')  # or 'models/gemini-1.0-pro'
     prompt = f"""
     You're a career expert. Review the following resume and give suggestions to improve:
     - Grammar and clarity
