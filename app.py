@@ -8,7 +8,7 @@ genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
 st.set_page_config(page_title="Gemini Resume Enhancer", page_icon="📄", layout="wide")
 
-st.title("✨ Gemini Resume Enhancer")
+st.title("Resume Enhancer")
 st.write("Upload your resume and get instant feedback from Google's Gemini AI. Improve your resume's grammar, project descriptions, ATS friendliness, and formatting.")
 # Upload resume
 uploaded_file = st.file_uploader("Upload your resume (PDF or DOCX)", type=["pdf", "docx"], label_visibility="collapsed")
