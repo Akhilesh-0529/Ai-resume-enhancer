@@ -1,6 +1,3 @@
-"""
-AI feedback generation using Google's Gemini API with enhanced analysis.
-"""
 import google.generativeai as genai
 import streamlit as st
 from .resume_analyzer import (
@@ -10,20 +7,9 @@ from .resume_analyzer import (
 )
 
 def initialize_gemini():
-    """Initialize the Gemini API with the API key."""
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
 def get_ai_feedback(resume_text: str, job_description: str = None) -> dict:
-    """
-    Get comprehensive AI-powered feedback on the resume.
-    
-    Args:
-        resume_text: The text content of the resume
-        job_description: Optional job description for matching
-        
-    Returns:
-        dict: Comprehensive analysis including scores, matches, and suggestions
-    """
     # Calculate various scores
     scores = calculate_resume_scores(resume_text, job_description)
     
