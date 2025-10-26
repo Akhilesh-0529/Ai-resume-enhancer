@@ -1,9 +1,10 @@
 """
-Main Streamlit application for Resume Enhancement with advanced analysis.
+Main Streamlit application for Resume Enhancement with advanced analysis and session management.
 """
 import streamlit as st
 from utils.text_extractor import extract_text_from_pdf, extract_text_from_docx
 from utils.ai_feedback import initialize_gemini, get_ai_feedback
+from utils.session_manager import SessionManager
 
 def display_scores(scores):
     """Display resume scores in a visually appealing way."""
@@ -50,9 +51,68 @@ def display_section_analysis(analysis):
                 st.text(details['content'])
             st.info(details['suggestions'])
 
+def display_history(session_manager):
+    """Display analysis history with expandable details."""
+    st.subheader("📚 Analysis History")
+    
+    history = session_manager.get_history()
+    if not history:
+        st.info("No analysis history yet. Upload a resume to get started!")
+        return
+    
+    for i, entry in enumerate(history):
+        with st.expander(f"Analysis {i+1} - {entry['timestamp']}"):
+            st.text_area("Resume Text", entry['resume_text'], height=100)
+            if entry['job_description']:
+                st.text_area("Job Description", entry['job_description'], height=100)
+            
+            results = entry['analysis_results']
+            
+            # Display scores
+            st.subheader("📊 Scores")
+            display_scores(results['scores'])
+            
+            # Display keyword matches
+            if 'keyword_matches' in results:
+                st.subheader("🎯 Keywords")
+                display_keyword_matches(results['keyword_matches'])
+            
+            # Display AI suggestions
+            st.subheader("💡 Suggestions")
+            st.markdown(results['ai_suggestions'])
+
+def display_insights(session_manager):
+    """Display insights learned from previous analyses."""
+    st.subheader("🧠 Learning Insights")
+    
+    insights = session_manager.get_learned_insights()
+    
+    # Display top keywords
+    if insights['top_keywords']:
+        st.write("**🔑 Most Successful Keywords:**")
+        keywords_html = " ".join([
+            f'<span style="background-color: #e6f3ff; padding: 0.2rem 0.5rem; '
+            f'border-radius: 1rem; margin: 0.2rem; display: inline-block;">{keyword}</span>'
+            for keyword in insights['top_keywords']
+        ])
+        st.markdown(keywords_html, unsafe_allow_html=True)
+    
+    # Display common improvements
+    if insights['common_improvements']:
+        st.write("**📈 Common Areas for Improvement:**")
+        for improvement, count in insights['common_improvements'].items():
+            st.write(f"- {improvement} *(suggested {count} times)*")
+    
+    # Display section patterns
+    if insights['section_patterns']:
+        st.write("**📑 Section Analysis Coverage:**")
+        for section, count in insights['section_patterns'].items():
+            st.write(f"- {section.title()}: {count} samples analyzed")
+
 def main():
-    # Initialize Gemini
+    # Initialize Gemini and Session Manager
     initialize_gemini()
+    session_manager = SessionManager()
     
     # Set page config
     st.set_page_config(
@@ -61,6 +121,10 @@ def main():
         layout="wide",
         initial_sidebar_state="expanded"
     )
+    
+    # Sidebar navigation
+    st.sidebar.title("⚙️ Options")
+    page = st.sidebar.radio("Navigate", ["Resume Analysis", "History & Insights"])
     
     # Sidebar
     with st.sidebar:
